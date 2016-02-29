@@ -1,22 +1,29 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>cz.cvut.bigdata</groupId>
-	<artifactId>WordCountMPv1</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<artifactId>WordCountExtended</artifactId>
+	<version>1.0.0</version>
 	<packaging>jar</packaging>
-	<name>WordCountMPv1</name>
+	<name>WordCountExtended</name>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<jdk.version>1.6</jdk.version>
+		<jdk.version>1.8</jdk.version>
+		<hadoop.version>2.6.0</hadoop.version>
+		<cdh.version>cdh5.5.1</cdh.version>
 	</properties>
+	<repositories>
+		<repository>
+			<id>cloudera</id>
+			<url>https://repository.cloudera.com/artifactory/cloudera-repos/</url>
+		</repository>
+	</repositories>
 	<build>
 		<finalName>${project.artifactId}</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.1</version>
+				<version>3.5.1</version>
 				<configuration>
 					<source>${jdk.version}</source>
 					<target>${jdk.version}</target>
@@ -25,11 +32,11 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.4</version>
+				<version>2.6</version>
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>cz.cvut.bigdata.WordCountMPv1.WordCount</mainClass>
+							<mainClass>cz.cvut.bigdata.wordcount.WordCount</mainClass>
 						</manifest>
 					</archive>
 				</configuration>
@@ -39,9 +46,9 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.hadoop</groupId>
-			<artifactId>hadoop-core</artifactId>
+			<artifactId>hadoop-client</artifactId>
+			<version>${hadoop.version}-${cdh.version}</version>
 			<scope>provided</scope>
-			<version>1.1.1</version>
 		</dependency>
 	</dependencies>
 </project>

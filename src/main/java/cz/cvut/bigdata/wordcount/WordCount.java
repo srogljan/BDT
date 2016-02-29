@@ -1,4 +1,4 @@
-package cz.cvut.bigdata.WordCountMPv1;
+package cz.cvut.bigdata.wordcount;
 
 import java.io.IOException;
 
@@ -155,7 +155,7 @@ public class WordCount extends Configured implements Tool
         // Configuration conf = new Configuration(true);
 
         // Create job.
-        Job job = new Job(conf, "WordCount");
+        Job job = Job.getInstance(conf, "WordCount");
         job.setJarByClass(WordCountMapper.class);
 
         // Setup MapReduce.
