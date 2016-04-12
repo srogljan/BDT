@@ -101,8 +101,7 @@ public class WordCount extends Configured implements Tool
             StringBuilder sb = new StringBuilder();
             if (words.length > 0)
             {
-                k.set(key.toString() +  " + " + words[0] + "\t:-) \n");
-//                sb.append(words[0]).append('\t');
+                k.set(words[0] + '\t');
             }
 
             for (String term : words)
