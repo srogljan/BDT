@@ -88,7 +88,7 @@ public class WordCount extends Configured implements Tool
      * because we do not use it anyway, and emits (word, 1) for each occurrence of the word
      * in the line of text (i.e. the received value).
      */
-    public static class WordCountMapper extends Mapper<Object, Text, Text, IntWritable>
+    public static class WordCountMapper extends Mapper<Object, Text, Text, Text>
     {
         private final IntWritable ONE = new IntWritable(1);
         private Text word = new Text();
@@ -97,11 +97,38 @@ public class WordCount extends Configured implements Tool
         {
             String[] words = value.toString().split(" ");
 
+            Text k = new Text();
+            StringBuilder sb = new StringBuilder();
+            if (words.length > 0)
+            {
+                k.set(key.toString() +  " + " + words[0] + "\t:-) \n");
+//                sb.append(words[0]).append('\t');
+            }
+
             for (String term : words)
             {
-                word.set(term);
-                context.write(word, ONE);
+                if (((term.length() >= 3) && (term.length() <=24))&& (!containsNumbers(term)))
+                {
+                    sb.append(" ").append(term.toLowerCase());
+                    /*word.set(term);
+                    context.write(word, ONE);/**/
+                }
             }
+            word.set(sb.toString());
+            context.write(k,word);
+        }
+        private boolean containsNumbers(String s)
+        {
+            return ((s.contains("0"))
+                || (s.contains("1"))
+                || (s.contains("2"))
+                || (s.contains("3"))
+                || (s.contains("4"))
+                || (s.contains("5"))
+                || (s.contains("6"))
+                || (s.contains("7"))
+                || (s.contains("8"))
+                || (s.contains("9")));
         }
     }
 
@@ -155,7 +182,7 @@ public class WordCount extends Configured implements Tool
         // Configuration conf = new Configuration(true);
 
         // Create job.
-        Job job = Job.getInstance(conf, "WordCount");
+        Job job = Job.getInstance(conf, "HW1-Preprocess");
         job.setJarByClass(WordCountMapper.class);
 
         // Setup MapReduce.
@@ -176,7 +203,7 @@ public class WordCount extends Configured implements Tool
         // to be 1, similarly you can set up the number of
         // reducers with the following line.
         //
-        // job.setNumReduceTasks(1);
+         job.setNumReduceTasks(0);
 
         // Specify (key, value).
         job.setOutputKeyClass(Text.class);
