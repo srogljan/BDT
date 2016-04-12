@@ -107,7 +107,7 @@ public class WordCount extends Configured implements Tool
 
             for (String term : words)
             {
-                if (((term.length() >= 3) && (term.length() <=24))&& (!containsNumbers(term)))
+                if (((term.length() >= 3) && (term.length() <=24)) && (!containsNumbers(term)) && (!containsDiacritics(term)))
                 {
                     sb.append(" ").append(term.toLowerCase());
                     /*word.set(term);
@@ -129,6 +129,15 @@ public class WordCount extends Configured implements Tool
                 || (s.contains("7"))
                 || (s.contains("8"))
                 || (s.contains("9")));
+        }
+        private boolean containsDiacritics(String s)
+        {
+            final StringBuilder pattern = new StringBuilder("<>.,/*-+!@#$%^&*()_\\");
+            for (int i = 0; i < pattern.length(); i++) 
+            {
+                if (s.contains(pattern.substring(i, i+1))) return true;
+            }
+            return false;
         }
     }
 
