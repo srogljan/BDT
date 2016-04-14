@@ -1,7 +1,8 @@
 package cz.cvut.bigdata.wordcount;
 
 import java.io.IOException;
-
+import java.util.HashSet;
+import java.util.Set;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
@@ -90,18 +91,58 @@ public class WordCount extends Configured implements Tool
      */
     public static class WordCountMapper extends Mapper<Object, Text, Text, IntWritable>
     {
-        private final IntWritable ONE = new IntWritable(1);
         private Text word = new Text();
+        private IntWritable doc = new IntWritable();
 
-        public void map(Object key, Text value, Context context) throws IOException, InterruptedException
+        public void map(Object key, Text value, Mapper.Context context) throws IOException, InterruptedException
         {
-            String[] words = value.toString().split(" ");
+            String[] split = value.toString().split("\t");
+            if (split.length != 3) return;
+
+            Integer docId = Integer.parseInt(split[0]);
+            String[] words = (split[1] + " " + split[2]).split(" ");
+            Set<String> slova = new HashSet<>();
 
             for (String term : words)
             {
-                word.set(term);
-                context.write(word, ONE);
+                term = term.toLowerCase().replaceAll("[^\\x20-\\x7E]", "");
+                if ((isValidTerm(term)) && (!slova.contains(term)))
+                {
+                    slova.add(term);
+                    word.set(term);
+                    doc.set(docId);
+                    context.write(word, doc);
+                }
             }
+        }
+        private boolean isValidTerm(String term)
+        {
+            return ((!"".equals(term))
+                    && ((term.length() >= 3) && (term.length() <=24))
+                    && (!containsNumbers(term))
+                    && (!containsDiacritics(term)));
+        }
+        private boolean containsNumbers(String s)
+        {
+            return ((s.contains("0"))
+                || (s.contains("1"))
+                || (s.contains("2"))
+                || (s.contains("3"))
+                || (s.contains("4"))
+                || (s.contains("5"))
+                || (s.contains("6"))
+                || (s.contains("7"))
+                || (s.contains("8"))
+                || (s.contains("9")));
+        }
+        private boolean containsDiacritics(String s)
+        {
+            final StringBuilder pattern = new StringBuilder("<>.,/*-+!@#$%^&*()_\\");
+            for (int i = 0; i < pattern.length(); i++)
+            {
+                if (s.contains(pattern.substring(i, i+1))) return true;
+            }
+            return false;
         }
     }
 
@@ -120,7 +161,7 @@ public class WordCount extends Configured implements Tool
 
             for (IntWritable value : values)
             {
-                sum += value.get();
+                sum++;
             }
 
             context.write(text, new IntWritable(sum));
@@ -176,7 +217,7 @@ public class WordCount extends Configured implements Tool
         // to be 1, similarly you can set up the number of
         // reducers with the following line.
         //
-        // job.setNumReduceTasks(1);
+        job.setNumReduceTasks(10);
 
         // Specify (key, value).
         job.setOutputKeyClass(Text.class);
