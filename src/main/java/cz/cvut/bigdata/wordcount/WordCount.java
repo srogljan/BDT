@@ -163,7 +163,14 @@ public class WordCount extends Configured implements Tool
             {
                 sum++;
             }
-
+            if (sum < context.getCounter("BDTtask1Stats", "minCounter").getValue())
+                context.getCounter("BDTtask1Stats", "minCounter").setValue(sum);
+            if (sum > context.getCounter("BDTtask1Stats", "maxCounter").getValue())
+                context.getCounter("BDTtask1Stats", "maxCounter").setValue(sum);
+            
+            context.getCounter("BDTtask1Stats", "avgCounter").setValue(
+                    (context.getCounter("BDTtask1Stats", "avgCounter").getValue() + sum) / 2);            
+            
             context.write(text, new IntWritable(sum));
         }
     }
