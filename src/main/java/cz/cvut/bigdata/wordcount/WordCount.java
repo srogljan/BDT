@@ -155,6 +155,9 @@ public class WordCount extends Configured implements Tool
      */
     public static class WordCountReducer extends Reducer<Text, IntWritable, Text, IntWritable>
     {
+        final int STOPWORDS = 900;
+        final int TYPOS = 5;
+
         public void reduce(Text text, Iterable<IntWritable> values, Context context) throws IOException, InterruptedException
         {
             int sum = 0;
@@ -163,8 +166,10 @@ public class WordCount extends Configured implements Tool
             {
                 sum++;
             }
-
-            context.write(text, new IntWritable(sum));
+            if ((sum <= STOPWORDS) && (sum >= TYPOS))
+            {
+                context.write(text, new IntWritable(sum));
+            }
         }
     }
 
@@ -217,7 +222,7 @@ public class WordCount extends Configured implements Tool
         // to be 1, similarly you can set up the number of
         // reducers with the following line.
         //
-        job.setNumReduceTasks(10);
+        //job.setNumReduceTasks(10);
 
         // Specify (key, value).
         job.setOutputKeyClass(Text.class);
